@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Movement - Factory Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007BFF; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; width: 100%; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        .error { color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; }
+        a { display: block; text-align: center; margin-top: 15px; color: #007BFF; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Record Stock Movement</h2>
+        <p>Material: <strong>{{ item.name }}</strong></p>
+        <p>Current Stock: <strong>{{ item.current_quantity }} {{ item.unit }}</strong></p>
+        
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="movement_type">Movement Type:</label>
+                <select name="movement_type" required>
+                    <option value="IN">Stock In (Received Shipment)</option>
+                    <option value="OUT">Stock Out (Used in Production)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" name="quantity" min="1" placeholder="Enter quantity" required>
+            </div>
+            <!-- Inside stock_movement.html, add this block inside your form before the submit button: -->
+            <div class="form-group" id="supplier-group">
+                <label for="supplier">Supplier (Optional for Stock In):</label>
+                <select name="supplier">
+                    <option value="">-- None / Direct --</option>
+                    {% for s in suppliers %}
+                        <option value="{{ s.id }}">{{ s.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+            <button type="submit">Submit Movement</button>
+        </form>
+        
+        <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

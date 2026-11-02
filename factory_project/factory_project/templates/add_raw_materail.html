@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Raw Material - Factory Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #28a745; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; width: 100%; font-size: 16px; }
+        a { display: block; text-align: center; margin-top: 15px; color: #007BFF; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Raw Material</h2>
+        <p>Register a new inventory item into the system.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Material Name:</label>
+                <input type="text" name="name" placeholder="e.g., Aluminum Rods" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="current_quantity">Initial Quantity:</label>
+                <input type="number" name="current_quantity" placeholder="e.g., 50" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="minimum_level">Minimum Alert Level:</label>
+                <input type="number" name="minimum_level" placeholder="e.g., 10" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="unit">Unit of Measurement:</label>
+                <input type="text" name="unit" placeholder="e.g., kg, pieces, meters" required>
+            </div>
+            
+            <button type="submit">Save Raw Material</button>
+        </form>
+        
+        <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

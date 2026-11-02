@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Order</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input { width: 100%; padding: 8px; box-sizing: border-box; }
+        .item-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; background: #f9f9f9; padding: 10px; border-radius: 4px; }
+        .btn { padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-secondary { background: #6c757d; margin-top: 10px; }
+        .btn-danger { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create New Customer Order</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Customer Name</label>
+                <!-- 👇 Changed from dropdown to a text input so you can type freely -->
+                <input type="text" name="customer_name" placeholder="Enter customer or company name" required>
+            </div>
+
+            <hr>
+            <h3>Order Items</h3>
+            <div id="items-container">
+                <div class="item-row">
+                    <div style="flex: 2;">
+                        <label>Product</label>
+                        <select name="products[]" required>
+                            <option value="">Select Product</option>
+                            {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }} (Stock: {{ product.current_quantity }} | ${{ product.price }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Quantity</label>
+                        <input type="number" name="quantities[]" value="1" min="1" required>
+                    </div>
+                    <div>
+                        <button type="button" class="btn-danger" onclick="this.parentElement.parentElement.remove()">X</button>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary" onclick="addItemRow()">+ Add Another Product</button>
+            <br><br>
+            <button type="submit" class="btn" style="width: 100%;">Save & Create Order</button>
+        </form>
+        <p style="margin-top: 15px;"><a href="{% url 'order_list' %}">Back to Orders</a></p>
+    </div>
+
+    <script>
+        function addItemRow() {
+            const container = document.getElementById('items-container');
+            const firstRow = container.querySelector('.item-row');
+            const newRow = firstRow.cloneNode(true);
+            newRow.querySelector('input[name="quantities[]"]').value = '1';
+            newRow.querySelector('select').selectedIndex = 0;
+            container.appendChild(newRow);
+        }
+    </script>
+</body>
+</html>

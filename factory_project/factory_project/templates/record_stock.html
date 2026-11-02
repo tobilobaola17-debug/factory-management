@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Record Stock Movement</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        select, input, textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Record Stock Movement: {{ material.name }}</h2>
+        <p>Current Stock: <strong>{{ material.current_quantity }} {{ material.unit }}</strong></p>
+        {% if error %}<p role="alert" style="color: #b42318;">{{ error }}</p>{% endif %}
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Movement Type</label>
+                <select name="movement_type" required>
+                    <option value="IN">Stock In (Received from Supplier)</option>
+                    <option value="OUT">Stock Out (Used in Production / Lost)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" step="0.01" name="quantity" min="0.01" required>
+            </div>
+
+            <div class="form-group">
+                <label>Supplier (Optional for Stock In)</label>
+                <select name="supplier">
+                    <option value="">Select Supplier</option>
+                    {% for supplier in suppliers %}
+                        <option value="{{ supplier.id }}" {% if material.supplier.id == supplier.id %}selected{% endif %}>{{ supplier.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Notes / Batch Number</label>
+                <textarea name="notes" rows="3" placeholder="Add any relevant notes here..."></textarea>
+            </div>
+
+            <button type="submit" class="btn">Submit Movement</button>
+        </form>
+        <p style="margin-top: 15px;"><a href="{% url 'raw_material_list' %}">Back to Materials</a></p>
+    </div>
+</body>
+</html>

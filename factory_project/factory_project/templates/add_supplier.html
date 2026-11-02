@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Supplier - Factory Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #28a745; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; width: 100%; font-size: 16px; margin-top: 10px; }
+        a { display: block; text-align: center; margin-top: 15px; color: #007BFF; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Supplier</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Supplier Name:</label>
+                <input type="text" name="name" placeholder="e.g., Global Metals Ltd" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact">Contact Info (Phone / Email):</label>
+                <input type="text" name="contact" placeholder="e.g., contact@globalmetals.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="materials">Materials Supplied (Hold Ctrl/Cmd to select multiple):</label>
+                <select name="materials" multiple style="height: 100px;">
+                    {% for m in materials %}
+                        <option value="{{ m.id }}">{{ m.name }}</option>
+                    {% endfor %}
+                </select>
+                <select name="materials" multiple>
+                    {% for material in materials %}
+                        <option value="{{ material.id }}">{{ material.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit">Save Supplier</button>
+        </form>
+        
+        <a href="{% url 'supplier_list' %}">Back to Suppliers</a>
+    </div>
+</body>
+</html>

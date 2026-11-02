@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Factory Dashboard & Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav { margin-bottom: 25px; }
+        .nav a { margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 5px solid #007bff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card.warning { border-left-color: #ffc107; }
+        .card.danger { border-left-color: #dc3545; }
+        .card h3 { margin: 0 0 10px 0; font-size: 16px; color: #6c757d; }
+        .card .number { font-size: 28px; font-weight: bold; color: #343a40; margin: 0; }
+        .section { margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-size: 14px; }
+        th { background: #007bff; color: white; }
+        .filter-form { display: flex; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 6px; align-items: flex-end; margin-bottom: 15px; }
+        .filter-group { flex: 1; }
+        .filter-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
+        .filter-group input { width: 100%; padding: 7px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-secondary { background: #6c757d; }
+        .badge-warning { background: #ffc107; color: black; padding: 3px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{% url 'products' %}"><i class="fas fa-boxes"></i> Products</a>
+            <a href="{% url 'raw_material_list' %}"><i class="fas fa-cubes"></i> Materials</a>
+            <a href="{% url 'production_list' %}"><i class="fas fa-industry"></i> Production</a>
+            <a href="{% url 'supplier_list' %}"><i class="fas fa-truck"></i> Suppliers</a>
+            <a href="{% url 'order_list' %}"><i class="fas fa-shopping-cart"></i> Orders</a>
+        </div>
+
+        <h2>Factory Command Dashboard</h2>
+
+        <!-- Metric Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Total Products</h3>
+                <p class="number">{{ total_products }}</p>
+            </div>
+            <div class="card {% if pending_orders_count > 0 %}warning{% endif %}">
+                <h3>Pending Orders</h3>
+                <p class="number">{{ pending_orders_count }}</p>
+            </div>
+            <div class="card {% if low_stock_count > 0 %}danger{% endif %}">
+                <h3>Low-Stock Materials</h3>
+                <p class="number">{{ low_stock_count }}</p>
+            </div>
+            <div class="card">
+                <h3>Today's Production Runs</h3>
+                <p class="number">{{ todays_production_count }}</p>
+            </div>
+        </div>
+
+        <!-- Low Stock Alert Banner / Table -->
+        {% if low_stock_materials %}
+        <div class="section" style="background: #fff3cd; padding: 15px; border-radius: 6px; border: 1px solid #ffeeba;">
+            <h3 style="color: #856404; margin-top: 0;"><i class="fas fa-exclamation-triangle"></i> Low Stock Warnings</h3>
+            <ul>
+                {% for mat in low_stock_materials %}
+                <li><strong>{{ mat.name }}</strong> is critically low! Current: {{ mat.current_quantity }} {{ mat.unit }} (Minimum: {{ mat.minimum_stock_level }} {{ mat.unit }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Date-Filtered Reports Section -->
+        <div class="section">
+            <h3>Production & Stock Reports</h3>
+            <form method="GET" class="filter-form">
+                <div class="filter-group">
+                    <label>Start Date</label>
+                    <input type="date" name="start_date" value="{{ start_date }}">
+                </div>
+                <div class="filter-group">
+                    <label>End Date</label>
+                    <input type="date" name="end_date" value="{{ end_date }}">
+                </div>
+                <div style="float: right;">
+                   <span>Logged in as: <strong>{{ request.user.username }}</strong> 
+                   ({% if request.user.is_superuser %}Admin{% elif request.user.profile %}{{ request.user.profile.get_role_display }}{% else %}Staff{% endif %})</span>
+                   <a href="{% url 'logout' %}" style="color: #dc3545; margin-left: 10px;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+                <div>
+                    <button type="submit" class="btn">Filter Report</button>
+                    {% if start_date %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Reset</a>
+                    {% endif %}
+                </div>
+            </form>
+
+            <h4>Filtered Production Logs</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Quantity Produced</th>
+                        <th>Supervisor</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for run in production_reports %}
+                    <tr>
+                        <td>{{ run.date }}</td>
+                        <td>{{ run.product.name }}</td>
+                        <td>{{ run.quantity_produced }}</td>
+                        <td>{{ run.supervisor }}</td>
+                        <td>{{ run.status }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No production records found for this date range.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>
+</html>

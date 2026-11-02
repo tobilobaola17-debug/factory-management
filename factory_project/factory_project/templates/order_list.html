@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Orders & Dispatch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav { margin-bottom: 20px; }
+        .nav a { margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #007bff; color: white; }
+        .btn { padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 4px; text-decoration: none; }
+        .btn-dispatch { background: #ffc107; color: black; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; }
+        .badge-pending { background: #ffeeba; color: #856404; }
+        .badge-dispatched { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{% url 'products' %}"><i class="fas fa-boxes"></i> Products</a>
+            <a href="{% url 'production_list' %}"><i class="fas fa-industry"></i> Production</a>
+            <a href="{% url 'supplier_list' %}"><i class="fas fa-truck"></i> Suppliers</a>
+            <a href="{% url 'order_list' %}"><i class="fas fa-shopping-cart"></i> Orders</a>
+        </div>
+
+        <h2>Customer Orders & Dispatch</h2>
+        <a href="{% url 'add_order' %}" class="btn"><i class="fas fa-plus"></i> Create New Order</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Products Requested</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.customer.name }}</td>
+                    <td>
+                        <ul>
+                            {% for item in order.items.all %}
+                                <li>{{ item.quantity }}x {{ item.product.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>${{ order.total_amount }}</td>
+                    <td>
+                        <span class="badge {% if order.status == 'Dispatched' %}badge-dispatched{% else %}badge-pending{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if order.status == 'Pending' %}
+                            <a href="{% url 'dispatch_order' order.id %}" class="btn btn-dispatch">Dispatch</a>
+                        {% else %}
+                            <span>Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No orders recorded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Stock - Factory Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f8f9fa; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input[type="number"] { width: 100%; padding: 8px; margin: 10px 0 15px 0; box-sizing: border-box; }
+        button { background: #28a745; color: white; padding: 10px 15px; border: none; cursor: pointer; border-radius: 4px; width: 100%; }
+        a { display: block; text-align: center; margin-top: 15px; color: #007BFF; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Update Raw Material</h2>
+        <p>Item: <strong>{{ item.name }}</strong></p>
+        <p>Current Quantity: {{ item.current_quantity }} {{ item.unit }}</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <label for="current_quantity">New Quantity:</label>
+            <input type="number" name="current_quantity" value="{{ item.current_quantity }}" required>
+            <button type="submit">Save Changes</button>
+        </form>
+        
+        <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

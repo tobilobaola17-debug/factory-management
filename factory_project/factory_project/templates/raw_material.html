@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Raw Materials Inventory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .nav { margin-bottom: 20px; }
+        .nav a { margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #007bff; color: white; }
+        .btn { padding: 8px 12px; background: #28a745; color: white; border: none; border-radius: 4px; text-decoration: none; display: inline-block; cursor: pointer; }
+        .badge-warning { background: #ffc107; color: black; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .messages { margin-bottom: 15px; }
+        .alert { padding: 10px; background: #d4edda; color: #155724; border-radius: 4px; margin-bottom: 10px; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{% url 'products' %}"><i class="fas fa-boxes"></i> Products</a>
+            <a href="{% url 'raw_material_list' %}"><i class="fas fa-cubes"></i> Materials</a>
+            <a href="{% url 'production_list' %}"><i class="fas fa-industry"></i> Production</a>
+            <a href="{% url 'supplier_list' %}"><i class="fas fa-truck"></i> Suppliers</a>
+            <a href="{% url 'order_list' %}"><i class="fas fa-shopping-cart"></i> Orders</a>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h2>Raw Materials Inventory</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Material Name</th>
+                    <th>Current Stock</th>
+                    <th>Minimum Level</th>
+                    <th>Primary Supplier</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materials %}
+                <tr>
+                    <td>{{ material.name }}</td>
+                    <td>{{ material.current_quantity }} {{ material.unit }}</td>
+                    <td>{{ material.minimum_stock_level }} {{ material.unit }}</td>
+                    <td>{{ material.supplier.name|default:"None Assigned" }}</td>
+                    <td>
+                        {% if material.is_low_stock %}
+                            <span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> LOW STOCK</span>
+                        {% else %}
+                            <span style="color: green; font-weight: bold;">Normal</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'record_stock_movement' material.id %}" class="btn">Stock In / Out</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No raw materials found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
