@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: factory-project
+    runtime: python
+    buildCommand: ./build.sh
+    startCommand: cd factory_project && gunicorn factory_project.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: PYTHON_VERSION
+        value: 3.13.0
