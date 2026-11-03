@@ -553,3 +553,20 @@ def delete_supplier_view(request, supplier_id):
         supplier.delete()
         return redirect('supplier_list')
     return render(request, 'confirm_delete.html', {'supplier': supplier})
+  
+  
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Account created for {username}! You can now log in.')
+            return redirect('login')  # Make sure 'login' matches your login URL name
+    else:
+        form = UserCreationForm()
+    return render(request, 'core/register.html', {'form': form})

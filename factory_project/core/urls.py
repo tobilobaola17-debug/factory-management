@@ -50,3 +50,10 @@ path('suppliers/add/', add_supplier_view, name='add_supplier'),
 path('suppliers/delete/<int:supplier_id>/', delete_supplier_view, name='delete_supplier'),
 ]    
 
+from .views import register_view
+
+urlpatterns = [
+    # ... your other urls like login ...
+    path('register/', register_view, name='register'),
+]
+
